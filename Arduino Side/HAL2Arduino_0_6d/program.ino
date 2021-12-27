@@ -123,9 +123,6 @@ void doUrgentStuff()
      things that are time sensitive but also don't require
      everything else wait for it to complete.
   */
-#if useLimitSwitches
-  checkSwitches();
-#endif
 #if useEncoder
   readEncoders();
 #endif
@@ -142,9 +139,6 @@ void doIdleStuff()
   */
 #if useTemperature
   temperatureLoop();
-#endif
-#if useSpindle
-  updateSpindle();
 #endif
 }
 
