@@ -86,7 +86,12 @@ void processCommand(long command, long dataOne, long dataTwo)
         SetHeadTemperature(dataTwo/10000);
       }
     } else if (command > 799 && command < 900) {
-      // This is a custom USER made command. 800~899
+      if(command == 800){
+        SetHeadTempInternal(dataTwo);
+      }
+      else if(command == 801){
+        SetBedTempInternal(dataTwo);
+      }
     } else if (command > 989 && command < 999) {
       // This is a firmware query.
       if (command == 990) { // Firmware title.

@@ -33,6 +33,10 @@ int CalculateHeadTemp() {
       Serial.print("504 0");
       Serial.print(TcAverage);
       Serial.println(";");
+
+      Serial.print("800 0");
+      Serial.print(TcAverage);
+      Serial.println(";");
       TcHeadOld = TcAverage;
     }
   }
@@ -51,6 +55,10 @@ int CalculateBedTemp() {
     TcAverage = TcCombinedBed / 10;
     if (TcAverage != TcBedOld && TcAverage < (TcBedOld + 20) && TcAverage > (TcBedOld - 20)) {
       Serial.print("503 0");
+      Serial.print(TcAverage);
+      Serial.println(";");
+
+      Serial.print("801 0");
       Serial.print(TcAverage);
       Serial.println(";");
       TcBedOld = TcAverage;
@@ -104,7 +112,7 @@ void HeadRelay(int temp, int tempExpected) {
       }
     }
     else if (temp < tempExpected - 30 && HeadStatus == true) {
-      Serial.println("302 0 0;"); // Kan fout zijn;
+      Serial.println("121 0 0;"); // Kan fout zijn;
       SetHeadTemperature(0);
       BedStatus == false;
     }
@@ -138,7 +146,7 @@ void BedRelay(int temp, int tempExpected) {
       }
     }
     else if (temp < tempExpected - 30 && BedStatus == true) {
-      Serial.println("302 0 0;"); // Kan fout zijn;
+      Serial.println("121 0 0;"); // Kan fout zijn;
       SetBedTemperature(0);
       BedStatus == false;
     }

@@ -394,6 +394,20 @@ def commandHandler(codesAccepted, axisesRequested):
 
                         if command == 508:
                             c['TemperatureBedReadyPin'] = val
+                        
+                        if command == 509:
+                            if c['PausePin'] == 1:
+                                c['PausePin'] = 0
+                            else
+                                c['PausePin'] = 1
+                        
+                        if command == 510:
+                            if c['StopPin'] == 1:
+                                c['StopPin'] = 0
+                            else
+                                c['StopPin'] = 1
+
+                            
 
 
                         
@@ -1707,6 +1721,18 @@ def makePins(codesAccepted, axisesRequested):
         else:
             print "makePins: creating: %r"
             c.newpin("TemperatureBedReadyPin",hal.HAL_BIT,hal.HAL_OUT)
+    if codesAccepted.find("509") > -1:
+        if simulation == True:
+            print "creating: PausePin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("PausePin",hal.HAL_BIT,hal.HAL_OUT)
+    if codesAccepted.find("510") > -1:
+        if simulation == True:
+            print "creating: StopPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("StopPin",hal.HAL_BIT,hal.HAL_OUT)
 
     # The following pins need to be iterated for each axis used.
     for i in range(0, 10):
