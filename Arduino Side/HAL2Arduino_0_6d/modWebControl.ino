@@ -5,7 +5,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "Guests";
+const char* ssid = "ThuisgroepOW";
 const char* password =  "grade!eight";
 
 int currentBedTemp;

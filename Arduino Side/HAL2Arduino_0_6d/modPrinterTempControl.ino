@@ -1,4 +1,4 @@
-#define useTemperature true
+#define useTemperature false
 // This modFile controls 3dprinter temperature functions.
 #if useTemperature
 const long interval = 100;

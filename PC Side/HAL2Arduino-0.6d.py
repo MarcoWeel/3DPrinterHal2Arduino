@@ -53,6 +53,7 @@ from decimal import *
 firmware = "HAL-2-Arduino"
 firmwareVersion = 0.6
 #maxUnits default is 10, up to 255.
+requiredClients = 2
 maxClients = 10
 global codesAccepted
 global axisesRequested
@@ -119,38 +120,39 @@ def comThread(port):
     global masterRx
     try:
         ser = Serial(port, 115200, timeout=0.02)
-        sleep(3) # Wait for arduino to boot.....
-        linkMsg = ser.readline()
-        if linkMsg.find('ok') > -1:
-            listOfPorts.append(port)
-            clientQueueArray.append(Queue(maxQueSize))
-            print "Found device on %s\nAsking for firmware info." % port
-            print "Firmware:",
-            if comSetup(ser, 990, 0, 0) == firmware:
-                print firmware
-                unitId=comSetup(ser, 992, 0, 0)
-                if unitId != "":
-                    print "Unit: %r" % unitId
-                    listOfUnits.append(unitId)
-                print "Version: ",
-                version=float(comSetup(ser, 991, 0, 0))
-                if version >= firmwareVersion:
-                    print "%.1f" % version
-                    codesAccepted = comSetup(ser, 993, 0, 0)
-                    listOfCommands.append(codesAccepted)
-                    axisesRequested = comSetup(ser, 994, 0, 0)
-                    listOfAxis.append(axisesRequested)
-                    commandList.append("")
-                    #locate this unit's position within the arrays.
-                    for n in range(0,len(listOfPorts)):
-                        if listOfPorts[n] == port:
-                            arrayPos=n
-                            pMsg=str(clientQueueArray[n])
-                            pMsg=pMsg.replace('<Queue.Queue instance at ', '')
-                            pMsg=pMsg.rstrip('>')
-                            print "comThread: port=%s\tarrayPos:%s\tQueue:%s" % (port,n,pMsg)
-                    clientQueue=clientQueueArray[arrayPos]
-                    # Client init complete. Proceed to operational loop.
+        if(len(listOfUnits) == requiredClients):
+            sleep(3) # Wait for arduino to boot.....
+            linkMsg = ser.readline()
+            if linkMsg.find('ok') > -1:
+                listOfPorts.append(port)
+                clientQueueArray.append(Queue(maxQueSize))
+                print "Found device on %s\nAsking for firmware info." % port
+                print "Firmware:",
+                if comSetup(ser, 990, 0, 0) == firmware:
+                    print firmware
+                    unitId=comSetup(ser, 992, 0, 0)
+                    if unitId != "":
+                        print "Unit: %r" % unitId
+                        listOfUnits.append(unitId)
+                    print "Version: ",
+                    version=float(comSetup(ser, 991, 0, 0))
+                    if version >= firmwareVersion:
+                        print "%.1f" % version
+                        codesAccepted = comSetup(ser, 993, 0, 0)
+                        listOfCommands.append(codesAccepted)
+                        axisesRequested = comSetup(ser, 994, 0, 0)
+                        listOfAxis.append(axisesRequested)
+                        commandList.append("")
+                        #locate this unit's position within the arrays.
+                        for n in range(0,len(listOfPorts)):
+                            if listOfPorts[n] == port:
+                                arrayPos=n
+                                pMsg=str(clientQueueArray[n])
+                                pMsg=pMsg.replace('<Queue.Queue instance at ', '')
+                                pMsg=pMsg.rstrip('>')
+                                print "comThread: port=%s\tarrayPos:%s\tQueue:%s" % (port,n,pMsg)
+                        clientQueue=clientQueueArray[arrayPos]
+                        # Client init complete. Proceed to operational loop.
                     while threadsRun == True:
                         while ser.inWaiting() > 0: # Listen for incomming data when txBuffer is empty
                             linkMsg = ser.readline()

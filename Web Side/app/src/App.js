@@ -34,7 +34,7 @@ const App = () => {
       </div>
       <div id="video-canvas" style={{ height: "480px", width: "640px" }}></div>
       <ArduinoControl/>
-      {/* <ArduinoStatus/> */}
+      <ArduinoStatus/>
     </div>
   );
 };
