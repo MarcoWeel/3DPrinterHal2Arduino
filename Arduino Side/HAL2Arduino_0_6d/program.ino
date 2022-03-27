@@ -73,18 +73,23 @@ void processCommand(long command, long dataOne, long dataTwo)
       // This is a command from the "iocontrol" catagory.
     } else if (command > 300 && command < 600) {
       // This is a command from the "iocontrol" catagory.
+#if useMiscControl
       if (command == 505 && dataTwo == 1) {
         SideFanRelay(true);
       }
       else if (command == 505 && dataTwo == 0) {
         SideFanRelay(false);
       }
+#endif
+#if useTemperature
       else if (command == 501) {
         SetBedTemperature(dataTwo/10000);
       }
       else if (command == 502) {
         SetHeadTemperature(dataTwo/10000);
       }
+#endif
+#if useWebControl
     } else if (command > 799 && command < 900) {
       if(command == 800){
         SetHeadTempInternal(dataTwo);
@@ -92,6 +97,7 @@ void processCommand(long command, long dataOne, long dataTwo)
       else if(command == 801){
         SetBedTempInternal(dataTwo);
       }
+#endif
     } else if (command > 989 && command < 999) {
       // This is a firmware query.
       if (command == 990) { // Firmware title.

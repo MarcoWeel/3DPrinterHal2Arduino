@@ -26,10 +26,12 @@ int CalculateHeadTemp() {
   logR2 = log(R2);
   T = (1.0 / (c1 + c2 * logR2 + c3 * logR2 * logR2 * logR2));
   Tc = T - 273.15;
+  if(Tc !> (TcHeadOld + 20) && Tc !< (TcHeadOld - 20)){
   TcCombinedHead += Tc;
+  }
   if (count == 10) {
     TcAverage = TcCombinedHead / 10;
-    if (TcAverage != TcHeadOld && TcAverage < (TcHeadOld + 20) && TcAverage > (TcHeadOld - 20)) {
+    if (TcAverage != TcHeadOld && TcAverage !< (TcHeadOld + 20) && TcAverage !> (TcHeadOld - 20)) {
       Serial.print("504 0");
       Serial.print(TcAverage);
       Serial.println(";");
@@ -50,10 +52,12 @@ int CalculateBedTemp() {
   logR2 = log(R2);
   T = (1.0 / (c1 + c2 * logR2 + c3 * logR2 * logR2 * logR2));
   Tc = T - 273.15;
-  TcCombinedBed += Tc;
+  if(Tc !> (TcBedOld + 20) && Tc !< (TcBedOld - 20)){
+  TcCombinedHead += Tc;
+  }
   if (count == 10) {
     TcAverage = TcCombinedBed / 10;
-    if (TcAverage != TcBedOld && TcAverage < (TcBedOld + 20) && TcAverage > (TcBedOld - 20)) {
+    if (TcAverage != TcBedOld && TcAverage !< (TcBedOld + 20) && TcAverage !> (TcBedOld - 20)) {
       Serial.print("503 0");
       Serial.print(TcAverage);
       Serial.println(";");
