@@ -4,11 +4,11 @@ import JSMpeg from "@cycjimmy/jsmpeg-player";
 import ArduinoControl from "./Components/ArduinoControl";
 import ArduinoStatus from "./Components/ArduinoStatus";
 
-const ffmpegIP = "localhost";
+const ffmpegIP = "192.168.2.32";
 
 const App = () => {
   useEffect(() => {
-    var videoUrl = `ws://${ffmpegIP}:6789/`;
+    var videoUrl = `ws://${ffmpegIP}:3001/`;
     var player = new JSMpeg.VideoElement("#video-canvas", videoUrl, {
       autoplay: true,
     });
@@ -33,8 +33,8 @@ const App = () => {
         Printer viewer
       </div>
       <div id="video-canvas" style={{ height: "480px", width: "640px" }}></div>
-      <ArduinoControl/>
-      <ArduinoStatus/>
+      <ArduinoControl />
+      <ArduinoStatus />
     </div>
   );
 };
