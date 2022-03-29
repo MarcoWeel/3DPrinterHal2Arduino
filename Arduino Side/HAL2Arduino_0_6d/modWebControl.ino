@@ -6,14 +6,14 @@
 #include <ArduinoJson.h>
 
 const char* ssid = "ThuisgroepOW";
-const char* password =  "grade!eight";
+const char* password =  "sukkel67919772!";
 
 int currentBedTemp;
 int currentHeadTemp;
 
 WiFiClient client;
 
-ESP8266WebServer server(80);
+ESP8266WebServer server(8083);
 
 void SetupWebControl() {
   WiFi.begin(ssid, password);  //Connect to the WiFi network
@@ -22,7 +22,7 @@ void SetupWebControl() {
     delay(500);
     Serial.println("Waiting to connect...");
   }
-
+  server.enableCORS(true);
   server.on("/stop", handleStop);
   server.on("/pause", handlePause);
   server.on("/temp", handleTemp);
@@ -31,17 +31,17 @@ void SetupWebControl() {
 }
 
 void WebControlLoop(){
-  
+  server.handleClient();
 }
 
 void handleStop() { 
-  server.send(200, "text/plain" , "received" );
-  Serial.println("510 0 0");
+  server.send(200);
+  Serial.println("510 0 0;");
 }
 
 void handlePause() { 
-  server.send(200, "text/plain" , "received" );
-  Serial.println("509 0 0");
+  server.send(200);
+  Serial.println("509 0 0;");
 }
 
 void handleTemp(){
@@ -51,7 +51,7 @@ void handleTemp(){
   root["headTemp"] = currentHeadTemp;
   String output;
   serializeJson(doc, output);
-  server.send(200, "text/plain" , output );
+  server.send(200, "text/json" , output );
 }
 
 void SetHeadTempInternal(int headTemp){

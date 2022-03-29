@@ -4,11 +4,12 @@ import JSMpeg from "@cycjimmy/jsmpeg-player";
 import ArduinoControl from "./Components/ArduinoControl";
 import ArduinoStatus from "./Components/ArduinoStatus";
 
-const ffmpegIP = "192.168.2.32";
+const ffmpegIP = "84.86.167.197:3001";
 
 const App = () => {
   useEffect(() => {
-    var videoUrl = `ws://${ffmpegIP}:3001/`;
+    var videoUrl = `ws://${ffmpegIP}`;
+    console.log(videoUrl);
     var player = new JSMpeg.VideoElement("#video-canvas", videoUrl, {
       autoplay: true,
     });

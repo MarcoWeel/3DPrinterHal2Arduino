@@ -120,7 +120,7 @@ def comThread(port):
     global masterRx
     try:
         ser = Serial(port, 115200, timeout=0.02)
-        if(len(listOfUnits) == requiredClients):
+        while(len(listOfUnits) == requiredClients):
             sleep(3) # Wait for arduino to boot.....
             linkMsg = ser.readline()
             if linkMsg.find('ok') > -1:

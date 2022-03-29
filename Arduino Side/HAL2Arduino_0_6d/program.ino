@@ -5,9 +5,9 @@
 
 void setup()
 {
-  while (!Serial) {
-    delay(400);
-  }
+//  while (!Serial) {
+//    delay(400);
+//  }
   Serial.begin(BAUD);
 #if useEncoder
   encoderSetup();
@@ -20,6 +20,9 @@ void setup()
 #endif
 #if useMiscControl
   miscPrinterControlSetup();
+#endif
+#if useWebControl
+SetupWebControl();
 #endif
   Serial.setTimeout(statementTimeout);
   Serial.println("ok");
@@ -150,6 +153,9 @@ void doIdleStuff()
   */
 #if useTemperature
   temperatureLoop();
+#endif
+#if useWebControl
+  WebControlLoop();
 #endif
 }
 
