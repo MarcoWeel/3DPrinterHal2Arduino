@@ -12,7 +12,7 @@
     "react-scripts": "^5.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=80 react-scripts start webpack-dev-server --port 80",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

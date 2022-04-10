@@ -46,9 +46,8 @@ void handlePause() {
 
 void handleTemp(){
   DynamicJsonDocument doc(1024);
-  JsonObject root = doc.as<JsonObject>();
-  root["bedTemp"] = currentBedTemp;
-  root["headTemp"] = currentHeadTemp;
+  doc["bedTemp"] = currentBedTemp;
+  doc["headTemp"] = currentHeadTemp;
   String output;
   serializeJson(doc, output);
   server.send(200, "text/json" , output );

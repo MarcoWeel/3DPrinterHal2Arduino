@@ -6,7 +6,7 @@ const handleStopClick = () => {
   if (window.confirm("Are you sure want to stop the printer?")) {
     axios({
       method: "post",
-      url: "http://84.86.167.197:8083/stop/",
+      url: "http://84.86.167.197:8083/stop",
     })
       .then((res) => {
         console.log(res);
@@ -23,7 +23,7 @@ const handlePauseClick = () => {
   if (window.confirm("Are you sure want to pause the printer?")) {
     axios({
       method: "post",
-      url: "http://84.86.167.197:8083/pause/",
+      url: "http://84.86.167.197:8083/pause",
     })
       .then((res) => {
         console.log(res);
