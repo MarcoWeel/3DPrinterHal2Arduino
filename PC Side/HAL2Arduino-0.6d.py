@@ -111,6 +111,7 @@ def comSetup(ser, command, data1, data2):
         linkMsg = ser.readline()
         if linkMsg.find('resend') > -1:
             ser.flushInput()
+            print "resend"
             ser.write(lastCommand)
         else: # Command sent successfully.
             return "%s" % linkMsg.rstrip('\r\n')
@@ -120,14 +121,22 @@ def comThread(port):
     global masterRx
     try:
         ser = Serial(port, 115200, timeout=0.02)
-        while(len(listOfUnits) == requiredClients):
-            sleep(3) # Wait for arduino to boot.....
+        if(True):
+            ser.setDTR(False) # Drop DTR
+            sleep(0.022)    # Read somewhere that 22ms is what the UI does.
+            ser.setDTR(True)
+            sleep(5) # Wait for arduino to boot.....
+            print port
             linkMsg = ser.readline()
+            print linkMsg
             if linkMsg.find('ok') > -1:
                 listOfPorts.append(port)
-                clientQueueArray.append(Queue(maxQueSize))
+                clientQueueArray.append(Queue(maxQueSize))                
+                ser.write("991 0 0;")
+                sleep(2)
+                ser.reset_input_buffer()
                 print "Found device on %s\nAsking for firmware info." % port
-                print "Firmware:",
+                print "Firmware:"
                 if comSetup(ser, 990, 0, 0) == firmware:
                     print firmware
                     unitId=comSetup(ser, 992, 0, 0)
@@ -187,7 +196,6 @@ def comThread(port):
                             #Nope. Just some spam in the buffer, don't waste bandwidth on it.
                             else:
                                 send=False
-				print("kkfalse")
                             if send:
 				print "comThread: Sending %s to %s" % (lastCommand, port)
                                 ser.write(lastCommand)
@@ -220,7 +228,7 @@ def comThread(port):
 #                    exit()
             else:
                 print "Failed. %s not found on this device\n" % firmware
-                ser.close()
+                #ser.close()
                 exit()
     except Exception:
         if not threadsRun:
@@ -400,14 +408,14 @@ def commandHandler(codesAccepted, axisesRequested):
                         if command == 509:
                             if c['PausePin'] == 1:
                                 c['PausePin'] = 0
-                            else
+                                c['ResumePin'] = 1
+                            else:
                                 c['PausePin'] = 1
+                                c['ResumePin'] = 0
                         
                         if command == 510:
-                            if c['StopPin'] == 1:
-                                c['StopPin'] = 0
-                            else
-                                c['StopPin'] = 1
+                            c['StopPin'] = 0
+                            c['StopPin'] = 1
 
                             
 
@@ -1729,12 +1737,36 @@ def makePins(codesAccepted, axisesRequested):
         else:
             print "makePins: creating: %r"
             c.newpin("PausePin",hal.HAL_BIT,hal.HAL_OUT)
+    if codesAccepted.find("509") > -1:
+        if simulation == True:
+            print "creating: ResumePin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("ResumePin",hal.HAL_BIT,hal.HAL_OUT)
     if codesAccepted.find("510") > -1:
         if simulation == True:
             print "creating: StopPin"
         else:
             print "makePins: creating: %r"
             c.newpin("StopPin",hal.HAL_BIT,hal.HAL_OUT)
+    if codesAccepted.find("511") > -1:
+        if simulation == True:
+            print "creating: StatusPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("StatusPin",hal.HAL_BIT,hal.HAL_IN)
+    if codesAccepted.find("512") > -1:
+        if simulation == True:
+            print "creating: ProgramStatusPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("ProgramStatusPin",hal.HAL_BIT,hal.HAL_IN)
+    if codesAccepted.find("513") > -1:
+        if simulation == True:
+            print "creating: TimeRemainingPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("TimeRemainingPin",hal.HAL_FLOAT,hal.HAL_IN)
 
     # The following pins need to be iterated for each axis used.
     for i in range(0, 10):
@@ -2103,7 +2135,7 @@ def makePins(codesAccepted, axisesRequested):
 try:
     threadsRun=True
     for i in range(0, maxClients - 1):
-        port = "/dev/ttyS" + str(i)
+        port = "/dev/ttyUSB" + str(i)
         start_new_thread(comThread, (port, ) )
         sleep(0.1)
     for i in range(0, maxClients - 1):
@@ -2118,8 +2150,11 @@ except Exception:
     sleep(3)
     raise SystemExit
 finally:
-    sleep(1)
-    if len(listOfUnits) == len(listOfPorts) and len(listOfUnits) > 0:
+    sleep(10)
+    print listOfUnits
+    print listOfPorts
+    print "_______________________________FAIL"
+    if len(listOfUnits) == len(listOfPorts) and len(listOfUnits) == requiredClients:
         sleep(1)
         makePins(str(listOfCommands), str(listOfAxis))
         start_new_thread( comService, (), )

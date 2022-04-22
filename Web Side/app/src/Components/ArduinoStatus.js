@@ -2,6 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function ArduinoStatus() {
+  const [isOnline, setOnlineStatus] = useState(false);
+  axios
+    .get("http://84.86.167.197:8083/online")
+    .then((response) => {
+      console.log("TEST");
+      setOnlineStatus(true);
+    })
+    .catch((error) => {
+      setOnlineStatus(false);
+    });
   const url = "http://84.86.167.197:8083/temp";
   const [request, setRequest] = useState({
     loading: false,
@@ -40,16 +50,34 @@ function ArduinoStatus() {
 
   return (
     <div>
-      {request.data != null && (
+      {isOnline && (
         <div>
           <span>Head temperature</span>
           <span>{request.data.headTemp}</span>
           <span>Bed temperature</span>
           <span>{request.data.bedTemp}</span>
-          {/* <span>Time remaining</span> */}
-          {/* <span>{status.timeLeft}</span> */}
-          {/* <span>Duration</span> */}
-          {/* <span>{status.timeDone}</span> */}
+          <span>Time remaining</span>
+          <span>{request.data.timeRemaining}</span>
+          {request.data.printerStatus == 0 && (
+            <div>
+              <span>Printer status : Offline</span>
+            </div>
+          )}
+          {request.data.printerStatus == 1 && (
+            <div>
+              <span>Printer status : Online</span>
+            </div>
+          )}
+          {request.data.programStatus == 0 && (
+            <div>
+              <span>Printer is not running</span>
+            </div>
+          )}
+          {request.data.programStatus == 1 && (
+            <div>
+              <span>Program is running</span>
+            </div>
+          )}
         </div>
       )}
     </div>

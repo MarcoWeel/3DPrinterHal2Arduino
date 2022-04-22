@@ -1,13 +1,18 @@
 // That's it your done. :)
 // This is the program that will actually run things.
 // There should be no need to modify it.
-
+//Highest 500 command is 513
+const long interval = 100;
+unsigned long previousMillis = 0;
+bool GotCommando = false;
 
 void setup()
 {
-//  while (!Serial) {
-//    delay(400);
-//  }
+  //  pinMode(2, OUTPUT);
+  //    while (!Serial) {
+  //      digitalWrite(2, !digitalRead(2));
+  //      delay(400);
+  //    }
   Serial.begin(BAUD);
 #if useEncoder
   encoderSetup();
@@ -20,9 +25,6 @@ void setup()
 #endif
 #if useMiscControl
   miscPrinterControlSetup();
-#endif
-#if useWebControl
-SetupWebControl();
 #endif
   Serial.setTimeout(statementTimeout);
   Serial.println("ok");
@@ -86,23 +88,39 @@ void processCommand(long command, long dataOne, long dataTwo)
 #endif
 #if useTemperature
       else if (command == 501) {
-        SetBedTemperature(dataTwo/10000);
+        SetBedTemperature(dataTwo / 10000);
       }
       else if (command == 502) {
-        SetHeadTemperature(dataTwo/10000);
+        SetHeadTemperature(dataTwo / 10000);
       }
 #endif
-#if useWebControl
+      if (command == 511) {
+        SetPrinterStatus(dataTwo);
+      }
+      else if (command == 512) {
+        SetProgramStatus(dataTwo);
+      }
+      else if (command == 513) {
+        SetTimeRemaining(dataTwo);
+      }
     } else if (command > 799 && command < 900) {
-      if(command == 800){
+#if useWebControl
+      if (command == 800) {
         SetHeadTempInternal(dataTwo);
       }
-      else if(command == 801){
+      else if (command == 801) {
         SetBedTempInternal(dataTwo);
       }
+#if useTemperature
+      else if (command == 802) {
+        SetHeadTemperature(0);
+        SetBedTemperature(0);
+      }
+#endif
 #endif
     } else if (command > 989 && command < 999) {
       // This is a firmware query.
+      GotCommando = true;
       if (command == 990) { // Firmware title.
         Serial.println(firmwareTitle);
       } else if (command == 991) { // Version info.
@@ -121,6 +139,9 @@ void processCommand(long command, long dataOne, long dataTwo)
           Serial.println("Debug: off");
         }
       } else if (command == 996) { // Got 'green light' from host to begin normal operations.
+#if useWebControl
+        SetupWebControl();
+#endif
         clientOps = true;
       }
     }
@@ -243,6 +264,14 @@ void loop() {
         integerValue[n] *= 10;  // shift left 1 decimal place
         if (!serRst)integerValue[n] = ((incomingByte - 48) + integerValue[n]);
       }
+    }
+  }
+  if (!GotCommando) {
+    unsigned long currentMillis = millis();
+
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      Serial.println("ok");
     }
   }
   if (clientOps) {

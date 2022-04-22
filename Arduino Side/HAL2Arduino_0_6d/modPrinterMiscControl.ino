@@ -16,6 +16,4 @@ void SideFanRelay(bool setting) {
     digitalWrite(SideFanRelayPin, HIGH);
   }
 }
-
-
 #endif
