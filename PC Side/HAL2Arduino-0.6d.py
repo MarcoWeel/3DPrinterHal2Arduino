@@ -414,7 +414,6 @@ def commandHandler(codesAccepted, axisesRequested):
                                 c['ResumePin'] = 0
                         
                         if command == 510:
-                            c['StopPin'] = 0
                             c['StopPin'] = 1
 
                             
@@ -2150,10 +2149,6 @@ except Exception:
     sleep(3)
     raise SystemExit
 finally:
-    sleep(10)
-    print listOfUnits
-    print listOfPorts
-    print "_______________________________FAIL"
     if len(listOfUnits) == len(listOfPorts) and len(listOfUnits) == requiredClients:
         sleep(1)
         makePins(str(listOfCommands), str(listOfAxis))

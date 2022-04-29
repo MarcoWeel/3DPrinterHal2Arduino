@@ -257,10 +257,6 @@ net a-pos-limit     =>  joint.3.pos-lim-sw-in
 
 #  ---HALUI signals---
 
-net pause halui.program.pause Hal2Arduino.PausePin
-net resume halui.program.resume Hal2Arduino.ResumePin
-net stop halui.program.stop Hal2Arduino.StopPin
-
 net axis-select-x  halui.axis.x.select
 net jog-x-pos      halui.axis.x.plus
 net jog-x-neg      halui.axis.x.minus
@@ -319,3 +315,9 @@ net tool-change-confirmed   iocontrol.0.tool-changed      <=  hal_manualtoolchan
 net tool-number             iocontrol.0.tool-prep-number  =>  hal_manualtoolchange.number
 net tool-prepare-loopback   iocontrol.0.tool-prepare      =>  iocontrol.0.tool-prepared
 
+#  ---Custom Pins---
+net isRunning Hal2Arduino.ProgramStatusPin halui.program.is-running
+net isOn Hal2Arduino.StatusPin halui.machine.is-on
+net pause halui.program.pause Hal2Arduino.PausePin
+net resume halui.program.resume Hal2Arduino.ResumePin
+net stop halui.program.stop Hal2Arduino.StopPin
