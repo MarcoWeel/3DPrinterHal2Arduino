@@ -1244,6 +1244,31 @@ def commandHandler(codesAccepted, axisesRequested):
                 checkSum=hostCheck+command
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
+        if codesAccepted.find("511") > -1:
+            command=505
+            hostCheck=c['StatusPin']
+            if hostCheck != hostCheckOld[command]:
+                hostCheckOld[command]=hostCheck
+                checkSum=hostCheck+command
+                comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
+                masterTx.put(comString)
+    if codesAccepted.find("512") > -1:
+            command=505
+            hostCheck=c['ProgramStatusPin']
+            if hostCheck != hostCheckOld[command]:
+                hostCheckOld[command]=hostCheck
+                checkSum=hostCheck+command
+                comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
+                masterTx.put(comString)
+    if codesAccepted.find("513") > -1:
+            command=505
+            hostCheck=c['TimeRemainingPin']
+            if hostCheck != hostCheckOld[command]:
+                hostCheckOld[command]=hostCheck
+                checkSum=hostCheck+command
+                comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
+                masterTx.put(comString)
+                
                 
         if masterTx.qsize():
             sleep((masterTx.qsize() * 0.005))

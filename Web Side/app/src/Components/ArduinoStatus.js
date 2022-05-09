@@ -2,16 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function ArduinoStatus() {
-  const [isOnline, setOnlineStatus] = useState(false);
-  axios
-    .get("http://84.86.167.197:8083/online")
-    .then((response) => {
-      console.log("TEST");
-      setOnlineStatus(true);
-    })
-    .catch((error) => {
-      setOnlineStatus(false);
-    });
   const url = "http://84.86.167.197:8083/temp";
   const [request, setRequest] = useState({
     loading: false,
@@ -40,6 +30,17 @@ function ArduinoStatus() {
     }
   };
 
+  const [isOnline, setOnlineStatus] = useState(false);
+  axios
+    .get("http://84.86.167.197:8083/online")
+    .then((response) => {
+      console.log("TEST");
+      setOnlineStatus(true);
+    })
+    .catch((error) => {
+      setOnlineStatus(false);
+    });
+
   useEffect(() => {
     const interval = setInterval(() => {
       GetStatus();
@@ -50,7 +51,7 @@ function ArduinoStatus() {
 
   return (
     <div>
-      {isOnline && (
+      {isOnline && request.data != null && (
         <div>
           <span>Head temperature</span>
           <span>{request.data.headTemp}</span>

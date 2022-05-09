@@ -116,7 +116,7 @@ void HeadRelay(int temp, int tempExpected) {
       }
     }
     else if (temp < tempExpected - 30 && HeadStatus == true) {
-      Serial.println("121 0 0;"); // Kan fout zijn;
+      Serial.println("510 0 0;"); // Kan fout zijn;
       SetHeadTemperature(0);
       BedStatus == false;
     }
@@ -150,7 +150,7 @@ void BedRelay(int temp, int tempExpected) {
       }
     }
     else if (temp < tempExpected - 30 && BedStatus == true || temp > tempExpected + 30 && BedStatus == true) {
-      Serial.println("121 0 0;"); // Kan fout zijn;
+      Serial.println("510 0 0;"); // Kan fout zijn;
       SetBedTemperature(0);
       BedStatus == false;
     }
