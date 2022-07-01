@@ -1,4 +1,4 @@
-#define useMiscControl false
+#define useMiscControl true
 // This modFile controls misc 3dprinter functions.
 #if useMiscControl
 const int SideFanRelayPin = 7;

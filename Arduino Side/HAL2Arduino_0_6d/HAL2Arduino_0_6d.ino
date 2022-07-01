@@ -173,17 +173,17 @@ The serial link works as follows:
 // Default max is 10, if you need more you'll need to edit the HAL2Arduino-[version].py file as well.
 
 //UNO
-//#define unitNumber 0
+#define unitNumber 0
 //NODEMCU
-#define unitNumber 1
+//#define unitNumber 1
 
 // When asked, request access to these commands.
 //#define commandsRequested "215 224 231 233" // 229"
 
 //UNO
-//#define commandsRequested "501 502 503 504 505 506 507 508 510 800 801"
+#define commandsRequested "501 502 503 504 505 506 507 508 510 800 801"
 //NODEMCU
-#define commandsRequested "509 510 511 512 513 800 801 802"
+//#define commandsRequested "509 510 511 512 513 800 801 802"
 
 // When asked, request access to these axises (for commands that use them).
 #define axisRequested "0 1 2 3 4"

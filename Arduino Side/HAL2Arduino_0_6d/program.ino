@@ -94,6 +94,7 @@ void processCommand(long command, long dataOne, long dataTwo)
         SetHeadTemperature(dataTwo / 10000);
       }
 #endif
+#if useWebControl
       if (command == 511) {
         SetPrinterStatus(dataTwo);
       }
@@ -103,6 +104,7 @@ void processCommand(long command, long dataOne, long dataTwo)
       else if (command == 513) {
         SetTimeRemaining(dataTwo);
       }
+#endif
     } else if (command > 799 && command < 900) {
 #if useWebControl
       if (command == 800) {
