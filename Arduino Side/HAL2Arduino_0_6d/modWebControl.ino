@@ -3,13 +3,14 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
+#include <UniversalTelegramBot.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
 const char* ssid = "ThuisgroepOW";
 const char* password =  "sukkel67919772!";
 
-#define TELEGRAM_BOT_TOKEN "TOKEN"
+#define TELEGRAM_BOT_TOKEN "5385827741:AAH8eyYhJUSEP5JS5nwYMO6rMr_mffNsmak"
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(TELEGRAM_BOT_TOKEN, client);
@@ -20,13 +21,16 @@ unsigned long lastTimeChecked;
 
 String ontv_text;
 
-int currentBedTemp;
-int currentHeadTemp;
+int currentBedTemp = 0;
+int currentHeadTemp = 0;
 int TimeRemaining = 0;
 int PrinterStatus = 0;
 int ProgramStatus = 0;
 
-WiFiClient client;
+String text = "";
+String temp = "";
+String old_text = "";
+int numNewMessages;
 
 ESP8266WebServer server(8083);
 
@@ -50,6 +54,7 @@ void SetupWebControl() {
 
 void WebControlLoop() {
   server.handleClient();
+  loop_telegram(text, old_text, numNewMessages);
 }
 
 void CheckIfOnline() {
@@ -93,6 +98,12 @@ void SetPrinterStatus(int Status) {
 
 void SetProgramStatus(int Status) {
   ProgramStatus = Status;
+  if(Status == 1){
+  Send_Message("Program running");
+  }
+  else{
+    Send_Message("Program not running");
+  }
 }
 
 void SetTimeRemaining(int SecondsRemaining) {
@@ -101,32 +112,28 @@ void SetTimeRemaining(int SecondsRemaining) {
 
 //TELEGRAM METHODES
 
+void Send_Message(String message) {
+  bot.sendMessage("1946205342", message, "Markdown");
+}
+
 void handleNewMessages(int numNewMessages) {
 
   for (int i = 0; i < numNewMessages; i++) {
-
-    Serial.print("chat_id");Serial.println(bot.messages[i].chat_id);
-    if (bot.messages[i].chat_id.equals("9952488")) {
+    if (bot.messages[i].chat_id.equals("1946205342")) {
       // If the type is a "callback_query", a inline keyboard button was pressed
       if (bot.messages[i].type ==  F("callback_query")) {
         ontv_text = bot.messages[i].text;
-        Serial.print("Call back button pressed with text: ");
-        Serial.println(ontv_text);
 
-        if (ontv_text == F("ON")) {
-        } else if (ontv_text == F("OFF")) {
-        } else if (ontv_text.startsWith("TIME")) {
-          ontv_text.replace("TIME", "");
-          int timeRequested = ontv_text.toInt();
-
-          lightTimerActive = true;
-          lightTimerExpires = millis() + (timeRequested * 1000 * 60);
+        if (ontv_text == F("Stop")) {
+          Serial.println("510 0 0;");
+          Serial.println("802 0 0;");
+        } else if (ontv_text == F("Pause")) {
+          Serial.println("509 0 0;");
         }
       } else {
         String chat_id = String(bot.messages[i].chat_id);
         String text = bot.messages[i].text;
-
-        if (ontv_text == F("/options")) {
+        if (text == F("/options")) {
 
           // Keyboard Json is an array of arrays.
           // The size of the main array is how many row options the keyboard has
@@ -135,44 +142,41 @@ void handleNewMessages(int numNewMessages) {
           // "The Text" property is what shows up in the keyboard
           // The "callback_data" property is the text that gets sent when pressed
 
-          String keyboardJson = F("[[{ \"text\" : \"ON\", \"callback_data\" : \"ON\" },{ \"text\" : \"OFF\", \"callback_data\" : \"OFF\" }],");
-          keyboardJson += F("[{ \"text\" : \"10 Mins\", \"callback_data\" : \"TIME10\" }, { \"text\" : \"20 Mins\", \"callback_data\" : \"TIME20\" }, { \"text\" : \"30 Mins\", \"callback_data\" : \"TIME30\" }]]");
-          bot.sendMessageWithInlineKeyboard(chat_id, "Sadbhs Stars", "", keyboardJson);
+          String keyboardJson = F("[[{ \"text\" : \"Stop\", \"callback_data\" : \"Stop\" },{ \"text\" : \"Pause\", \"callback_data\" : \"Pause\" }]]");
+          bot.sendMessageWithInlineKeyboard(chat_id, "Controls ", "", keyboardJson);
+        }
+
+        if(text == F("/Status")){
+          String message = "BedTemp: " + String(currentBedTemp) + " HeadTemp: " + String(currentHeadTemp) + " Time remaining: " + String(TimeRemaining);
+          Send_Message(message);
         }
 
         // When a user first uses a bot they will send a "/start" command
         // So this is a good place to let the users know what commands are available
-        if (ontv_text == F("/start")) {
+        if (text == F("/start")) {
 
-          bot.sendMessage(chat_id, "/options : returns the inline keyboard\n", "Markdown");
+          bot.sendMessage(chat_id, "/options : returns the inline keyboard\n /Status the temp and time remaining", "Markdown");
         }
       }
     }
   }
 }
 
-void loop_telegram(String &text,String old_text,int &numNewMessages) {
+void loop_telegram(String &text, String old_text, int &numNewMessages) {
   if (millis() > lastTimeChecked + delayBetweenChecks)  {
 
     // getUpdates returns 1 if there is a new message from Telegram
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-    Serial.print("numNewM ");Serial.print(numNewMessages);Serial.print("bot.last ");
-    Serial.println(bot.last_message_received);
 
 
     if (numNewMessages) {
-      Serial.println("got response");
-      bot.sendMessage("9952488", "eric  jj", "Markdown");
+      //  bot.sendMessage("1946205342", "eric  jj", "Markdown");
+      //Send_Message("TESTING");
       handleNewMessages(numNewMessages);
       text = ontv_text;
     }
 
     lastTimeChecked = millis();
-
-    if (lightTimerActive && millis() > lightTimerExpires) {
-      lightTimerActive = false;
-      digitalWrite(LED_PIN, LOW);
-    }
   }
 }
 #endif

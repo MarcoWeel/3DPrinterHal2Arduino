@@ -121,8 +121,8 @@ void ControlRelays(int BedTemp, int HeadTemp) {
 
 void HeadRelay(int temp, int tempExpected) {
   if (HeadHeating) {
-    if (tempExpected < temp - 1 && temp < -270) {
-      digitalWrite(HeadRelayPin, HIGH);
+    if (tempExpected < temp - 1 && temp > -270 && tempExpected + 5 > temp) {
+      digitalWrite(HeadRelayPin, HIGH);           
       HeadHeating = false;
       if (HeadStatus == false) {
         HeadStatus = true;
@@ -131,11 +131,11 @@ void HeadRelay(int temp, int tempExpected) {
     else if (temp < tempExpected - 30 && HeadStatus == true) {
       Serial.println("510 0 0;"); // Kan fout zijn;
       SetHeadTemperature(0);
-      BedStatus == false;
+      HeadStatus = false;
     }
   }
   else {
-    if (tempExpected - 1 > temp && temp < -270 || temp > tempExpected + 30 && BedStatus == true) {
+    if (tempExpected - 1 > temp && temp > -270 || temp > tempExpected + 30 && BedStatus == true) {
       HeadHeating = true;
       digitalWrite(HeadRelayPin, LOW);
     }
@@ -146,7 +146,7 @@ void HeadRelay(int temp, int tempExpected) {
   else {
     digitalWrite(FanRelayPin, HIGH);
   }
-  if (HeadStatus == false && tempExpected < temp - 1 && tempExpected < temp + 5 && temp < -270) {
+  if (HeadStatus == false && tempExpected < temp - 1 && tempExpected < temp + 5 && temp > -270) {
     HeadStatus = true;
     Serial.println("506 0 1 507;");
   }
@@ -154,18 +154,18 @@ void HeadRelay(int temp, int tempExpected) {
 
 void BedRelay(int temp, int tempExpected) {
   if (BedHeating) {
-    if (tempExpected < temp - 1 && temp < -270) {
+    if (tempExpected < temp - 1 && temp > -270 && tempExpected + 5 > temp) {
       digitalWrite(BedRelayPin, LOW);
       BedHeating = false;
       if (BedStatus == false) {
-        Serial.println("507 0 1 508;");
+        Serial.println("507 0 1 508;"); 
         BedStatus = true;
       }
     }
     else if (temp < tempExpected - 30 && BedStatus == true || temp > tempExpected + 30 && BedStatus == true) {
       Serial.println("510 0 0;"); // Kan fout zijn;
       SetBedTemperature(0);
-      BedStatus == false;
+      BedStatus = false;
     }
   }
   else {
