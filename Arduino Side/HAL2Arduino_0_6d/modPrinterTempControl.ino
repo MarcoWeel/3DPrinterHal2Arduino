@@ -33,7 +33,7 @@ int CalculateHeadTemp() {
     TcCombinedHead += Tc;
     countHead++;
   }
-  if (countHead == 10  || countHead > 10) {
+  if (countHead == 10 || countHead > 10) {
     TcAverage = TcCombinedHead / 10;
     if (TcAverage != TcHeadOld && TcAverage < (TcHeadOld + 20) && TcAverage > (TcHeadOld - 20) || IsStartupHead) {
       Serial.print("504 0 ");
@@ -124,19 +124,17 @@ void ControlRelays(int BedTemp, int HeadTemp) {
 void HeadRelay(int temp, int tempExpected) {
   if (HeadHeating) {
     if (tempExpected < temp - 1 && temp > -270 && tempExpected + 5 > temp) {
-      digitalWrite(HeadRelayPin, HIGH);           
+      digitalWrite(HeadRelayPin, HIGH);
       HeadHeating = false;
       if (HeadStatus == false) {
         HeadStatus = true;
       }
-    }
-    else if (temp < tempExpected - 20 && HeadStatus == true || temp > tempExpected + 20 && HeadStatus == true) {
-      Serial.println("510 0 0;"); // Kan fout zijn;
+    } else if (temp < tempExpected - 20 && HeadStatus == true || temp > tempExpected + 20 && HeadStatus == true) {
+      Serial.println("510 0 0;");  // Kan fout zijn;
       SetHeadTemperature(0);
       HeadStatus = false;
     }
-  }
-  else {
+  } else {
     if (tempExpected - 1 > temp && temp > -270) {
       HeadHeating = true;
       digitalWrite(HeadRelayPin, LOW);
@@ -144,8 +142,7 @@ void HeadRelay(int temp, int tempExpected) {
   }
   if (temp > 45) {
     digitalWrite(FanRelayPin, LOW);
-  }
-  else {
+  } else {
     digitalWrite(FanRelayPin, HIGH);
   }
   if (HeadStatus == false && tempExpected < temp - 1 && tempExpected < temp + 5 && temp > -270 && tempExpected != 0) {
@@ -160,17 +157,15 @@ void BedRelay(int temp, int tempExpected) {
       digitalWrite(BedRelayPin, LOW);
       BedHeating = false;
       if (BedStatus == false) {
-        Serial.println("508 0 1 509;"); 
+        Serial.println("508 0 1 509;");
         BedStatus = true;
       }
-    }
-    else if (temp < tempExpected - 20 && BedStatus == true || temp > tempExpected + 20 && BedStatus == true) {
-      Serial.println("510 0 0;"); // Kan fout zijn;
+    } else if (temp < tempExpected - 20 && BedStatus == true || temp > tempExpected + 20 && BedStatus == true) {
+      Serial.println("510 0 0;");  // Kan fout zijn;
       SetBedTemperature(0);
       BedStatus = false;
     }
-  }
-  else {
+  } else {
     if (tempExpected - 1 > temp && temp > -270 || tempExpected > temp + 5 && temp > -270) {
       BedHeating = true;
       digitalWrite(BedRelayPin, HIGH);

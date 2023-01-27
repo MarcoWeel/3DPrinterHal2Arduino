@@ -6,8 +6,7 @@ const long interval = 100;
 unsigned long previousMillis = 0;
 bool GotCommando = false;
 
-void setup()
-{
+void setup() {
   //  pinMode(2, OUTPUT);
   //    while (!Serial) {
   //      digitalWrite(2, !digitalRead(2));
@@ -41,34 +40,33 @@ void setup()
 long checksumOld = 0;
 boolean debug = false;
 
-void processCommand(long command, long dataOne, long dataTwo)
-{
+void processCommand(long command, long dataOne, long dataTwo) {
   if (command + dataOne + dataTwo != checksumOld) {
     if (command > 99 && command < 200) {
       // This is a command from the "motion" catagory.
 #if useSpindle
-      if (command == 130) { // motion.spindle-brake
+      if (command == 130) {  // motion.spindle-brake
         spindleBrake = dataTwo;
       }
-      if (command == 131) { // motion.spindle-forward
+      if (command == 131) {  // motion.spindle-forward
         spindleSetDir = dataTwo;
       }
 #if useEncoder
-      if (command == 132) { // motion.spindle-index-enable
+      if (command == 132) {  // motion.spindle-index-enable
         sendSpindleIndexSignal = dataTwo;
         //          spindleIndexEnabled[dataOne]=dataTwo;
       }
 #endif
-      if (command == 133) { // motion.spindle-on
+      if (command == 133) {  // motion.spindle-on
         spindleEnabled = dataTwo;
       }
-      if (command == 134) { // motion.spindle-reverse
+      if (command == 134) {  // motion.spindle-reverse
         spindleSetDir = !dataTwo;
       }
-      if (command == 137) { // motion.spindle-speed-out
+      if (command == 137) {  // motion.spindle-speed-out
         spindleSetRpm = dataTwo;
       }
-      if (command == 138) { // motion.spindle-speed-out-rps
+      if (command == 138) {  // motion.spindle-speed-out-rps
         spindleSetRpm = dataTwo * 60;
       }
 #endif
@@ -81,27 +79,25 @@ void processCommand(long command, long dataOne, long dataTwo)
 #if useMiscControl
       if (command == 505 && dataTwo == 1) {
         SideFanRelay(true);
-      }
-      else if (command == 505 && dataTwo == 0) {
+      } else if (command == 505 && dataTwo == 0) {
         SideFanRelay(false);
+      } else if (command == 514) {
+        StartProbing();
       }
 #endif
 #if useTemperature
       else if (command == 501) {
         SetBedTemperature(dataTwo / 10000);
-      }
-      else if (command == 502) {
+      } else if (command == 502) {
         SetHeadTemperature(dataTwo / 10000);
       }
 #endif
 #if useWebControl
       if (command == 511) {
         SetPrinterStatus(dataTwo);
-      }
-      else if (command == 512) {
+      } else if (command == 512) {
         SetProgramStatus(dataTwo);
-      }
-      else if (command == 513) {
+      } else if (command == 513) {
         SetTimeRemaining(dataTwo);
       }
 #endif
@@ -109,8 +105,7 @@ void processCommand(long command, long dataOne, long dataTwo)
 #if useWebControl
       if (command == 800) {
         SetHeadTempInternal(dataTwo);
-      }
-      else if (command == 801) {
+      } else if (command == 801) {
         SetBedTempInternal(dataTwo);
       }
 #if useTemperature
@@ -123,24 +118,24 @@ void processCommand(long command, long dataOne, long dataTwo)
     } else if (command > 989 && command < 999) {
       // This is a firmware query.
       GotCommando = true;
-      if (command == 990) { // Firmware title.
+      if (command == 990) {  // Firmware title.
         Serial.println(firmwareTitle);
-      } else if (command == 991) { // Version info.
+      } else if (command == 991) {  // Version info.
         Serial.println(Version);
-      } else if (command == 992) { // unitId if used in a swarm.
+      } else if (command == 992) {  // unitId if used in a swarm.
         Serial.println(unitNumber);
-      } else if (command == 993) { // request HAL hooks per command list.
+      } else if (command == 993) {  // request HAL hooks per command list.
         Serial.println(commandsRequested);
-      } else if (command == 994) { // request HAL hooks per axis list.
+      } else if (command == 994) {  // request HAL hooks per axis list.
         Serial.println(axisRequested);
-      } else if (command == 995) { // toggle debugging output.
+      } else if (command == 995) {  // toggle debugging output.
         debug = !debug;
         if (debug) {
           Serial.println("Debug: on");
         } else {
           Serial.println("Debug: off");
         }
-      } else if (command == 996) { // Got 'green light' from host to begin normal operations.
+      } else if (command == 996) {  // Got 'green light' from host to begin normal operations.
 #if useWebControl
         SetupWebControl();
 #endif
@@ -148,12 +143,11 @@ void processCommand(long command, long dataOne, long dataTwo)
       }
     }
     // Anti-spam check.
-    checksumOld = command + dataOne + dataTwo; // Should not have any, but just in case.
+    checksumOld = command + dataOne + dataTwo;  // Should not have any, but just in case.
   }
 }
 
-void doUrgentStuff()
-{
+void doUrgentStuff() {
   /* This is a good place to call a functions to handle
      limit switches and NON-blocking
      stepper or servo/encoder controller routines;
@@ -168,8 +162,7 @@ void doUrgentStuff()
 #endif
 }
 
-void doIdleStuff()
-{
+void doIdleStuff() {
   /* This is a good place to call less time sensitive
      functions like coolant/lube pumps, jog wheels,
      button controls, status LEDs and LCD updates.
@@ -179,6 +172,9 @@ void doIdleStuff()
 #endif
 #if useWebControl
   WebControlLoop();
+#endif
+#if useMiscControl
+  MiscLoop();
 #endif
 }
 
@@ -233,7 +229,8 @@ void loop() {
       for (int i = 0; i < numWords; i++) {
         if (clientOps) {
           doUrgentStuff();
-        } integerValue[i] = 0;
+        }
+        integerValue[i] = 0;
       };
       n = 0;
       serRst = false;
@@ -243,14 +240,16 @@ void loop() {
       if (makeNeg) {
         integerValue[n] *= -1;
         makeNeg = false;
-      } n++;
+      }
+      n++;
       incomingByte = Serial.read();
     }
     if (incomingByte == ';') {
       if (makeNeg) {
         integerValue[n] *= -1;
         makeNeg = false;
-      } validateCommand();
+      }
+      validateCommand();
       serRst = true;
     }
     if (incomingByte == '\r') {
@@ -259,12 +258,12 @@ void loop() {
     if (incomingByte == '\n') {
       serRst = true;
     }
-    if (incomingByte == '-') { // got a "-" symbol.
-      makeNeg = true; // make value negative.
+    if (incomingByte == '-') {  // got a "-" symbol.
+      makeNeg = true;           // make value negative.
     } else {
       if (incomingByte > 47 && incomingByte < 58) {
         integerValue[n] *= 10;  // shift left 1 decimal place
-        if (!serRst)integerValue[n] = ((incomingByte - 48) + integerValue[n]);
+        if (!serRst) integerValue[n] = ((incomingByte - 48) + integerValue[n]);
       }
     }
   }

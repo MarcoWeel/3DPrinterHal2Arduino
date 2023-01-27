@@ -8,7 +8,7 @@
 #include <ArduinoJson.h>
 
 const char* ssid = "ThuisgroepOW";
-const char* password =  "sukkel67919772!";
+const char* password = "sukkel67919772!";
 
 #define TELEGRAM_BOT_TOKEN "5385827741:AAH8eyYhJUSEP5JS5nwYMO6rMr_mffNsmak"
 
@@ -49,7 +49,7 @@ void SetupWebControl() {
   server.on("/temp", handleGet);
   server.on("/online", CheckIfOnline);
 
-  server.begin(); //Start the server
+  server.begin();  //Start the server
 }
 
 void WebControlLoop() {
@@ -81,7 +81,7 @@ void handleGet() {
   doc["programStatus"] = ProgramStatus;
   String output;
   serializeJson(doc, output);
-  server.send(200, "text/json" , output );
+  server.send(200, "text/json", output);
 }
 
 void SetHeadTempInternal(int headTemp) {
@@ -98,10 +98,9 @@ void SetPrinterStatus(int Status) {
 
 void SetProgramStatus(int Status) {
   ProgramStatus = Status;
-  if(Status == 1){
-  Send_Message("Program running");
-  }
-  else{
+  if (Status == 1) {
+    Send_Message("Program running");
+  } else {
     Send_Message("Program not running");
   }
 }
@@ -121,7 +120,7 @@ void handleNewMessages(int numNewMessages) {
   for (int i = 0; i < numNewMessages; i++) {
     if (bot.messages[i].chat_id.equals("1946205342")) {
       // If the type is a "callback_query", a inline keyboard button was pressed
-      if (bot.messages[i].type ==  F("callback_query")) {
+      if (bot.messages[i].type == F("callback_query")) {
         ontv_text = bot.messages[i].text;
 
         if (ontv_text == F("Stop")) {
@@ -146,7 +145,7 @@ void handleNewMessages(int numNewMessages) {
           bot.sendMessageWithInlineKeyboard(chat_id, "Controls ", "", keyboardJson);
         }
 
-        if(text == F("/Status")){
+        if (text == F("/Status")) {
           String message = "BedTemp: " + String(currentBedTemp) + " HeadTemp: " + String(currentHeadTemp) + " Time remaining: " + String(TimeRemaining);
           Send_Message(message);
         }
@@ -162,8 +161,8 @@ void handleNewMessages(int numNewMessages) {
   }
 }
 
-void loop_telegram(String &text, String old_text, int &numNewMessages) {
-  if (millis() > lastTimeChecked + delayBetweenChecks)  {
+void loop_telegram(String& text, String old_text, int& numNewMessages) {
+  if (millis() > lastTimeChecked + delayBetweenChecks) {
 
     // getUpdates returns 1 if there is a new message from Telegram
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);

@@ -158,6 +158,10 @@ The serial link works as follows:
   995  Toggle debug output. (Hint: 995 0 0 995;)
   996  Received confirmation to begin normal operation.
   997 Client ACK signal.
+
+  514 Probing
+  509 Pause command (used via web and filament sensor)
+  
 */
 
 // What baudrate should we use.
@@ -181,7 +185,7 @@ The serial link works as follows:
 //#define commandsRequested "215 224 231 233" // 229"
 
 //UNO
-#define commandsRequested "501 502 503 504 505 506 507 508 510 800 801"
+#define commandsRequested "501 502 503 504 505 506 507 508 510 800 801 514"
 //NODEMCU
 //#define commandsRequested "509 510 511 512 513 800 801 802"
 
