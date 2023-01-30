@@ -416,6 +416,9 @@ def commandHandler(codesAccepted, axisesRequested):
                         if command == 510:
                             c['StopPin'] = 1
 
+                        if command == 514:
+                            c['ProbeInputPin'] = val
+
                             
 
 
@@ -1791,8 +1794,14 @@ def makePins(codesAccepted, axisesRequested):
         else:
             print "makePins: creating: %r"
             c.newpin("TimeRemainingPin",hal.HAL_FLOAT,hal.HAL_IN)
+    if codesAccepted.find("514") > -1:
+        if simulation == True:
+            print "creating: ProbeInputPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("ProbeInputPin",hal.HAL_BIT,hal.HAL_OUT)
 
-    # The following pins need to be iterated for each axis used.
+    # The following pins need to be iterated for each axis used. 
     for i in range(0, 10):
         if codesAccepted.find("200") > -1 and axisesRequested.find(str(i)) > -1:
             pinLabel = "axis_" + str(i) + "_active"

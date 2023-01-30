@@ -293,7 +293,7 @@ net coolant-flood     <=  iocontrol.0.coolant-flood
 
 #  ---probe signal---
 
-net probe-in     =>  motion.probe-input
+net probe-in     =>  motion.probe-input Hal2Arduino.ProbeInputPin
 
 #  ---motion control signals---
 

@@ -5,15 +5,18 @@ import hal # LinuxCNC must be up and running prior to loading this.
 c = hal.component("Hal2Arduino")
 hostCheckOld=range(0,550)
 
-def StopPinResetter():
+def PinResetter():
     command = 510
-    hostCheck=c["StopPin"]
-    if hostCheck == 1:
+    hostCheck510=c["StopPin"]
+    hostCheck514=c["ProbeInputPin"]
+    if hostCheck510 == 1:
         c["StopPin"] = 0
+    if hostCheck514 == 1:
+        c["ProbeInputPin"] = 0
 
 try:
     while(True):
-        StopPinResetter()
+        PinResetter()
         sleep(0.25)
 
 except Exception:

@@ -5,10 +5,10 @@
 Servo myservo;  // create servo object to control a servo
 int Touch = 0;
 //const int ledPin = 13;       // the pin that the LED is attached to
-const int servoPin = 9;
-const byte interruptPin = 2;  // White probe output wire to Digital pin 2
+const int servoPin = 2;
+const byte interruptPin = 3;  // White probe output wire to Digital pin 2
 const int SideFanRelayPin = 7;
-const int filamentDetectorPin = 10;  //ZEKER VERANDEREREN
+const int filamentDetectorPin = 5;  
 const long sensorTimeInterval = 250;
 unsigned long sensorTimePreviousMillis = 0;
 
@@ -37,6 +37,7 @@ void StartProbing() {
 }
 
 void SendProbeSignal() {
+  Serial.println("514 0 1;");
   myservo.write(90);
 }
 
