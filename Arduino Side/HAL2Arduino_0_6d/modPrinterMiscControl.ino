@@ -8,20 +8,25 @@ int Touch = 0;
 const int servoPin = 2;
 const byte interruptPin = 3;  // White probe output wire to Digital pin 2
 const int SideFanRelayPin = 7;
-const int filamentDetectorPin = 5;  
+const int filamentDetectorPin = 5;
 const long sensorTimeInterval = 250;
 unsigned long sensorTimePreviousMillis = 0;
+
+bool isProbing = false;
 
 //PINS CHECKEN EN EVENTUEEL VERANDEREN
 
 void miscPrinterControlSetup() {
   digitalWrite(SideFanRelayPin, HIGH);
   pinMode(SideFanRelayPin, OUTPUT);
-  myservo.attach(servoPin);  // attaches the servo on pin 9 to the servo object
+  myservo.attach(servoPin);  // attaches the servo on pin 2 to the servo object
   //pinMode(ledPin, OUTPUT);
   pinMode(interruptPin, INPUT_PULLUP);
   pinMode(filamentDetectorPin, INPUT);
   attachInterrupt(digitalPinToInterrupt(interruptPin), SendProbeSignal, RISING);  // off to on will interrupt & go to blink function MISS NAAR FALLING IPV RISING
+  //myservo.write(90);
+  //ResetProbe();
+  myservo.write(60);
 }
 
 void SideFanRelay(bool setting) {
@@ -34,11 +39,21 @@ void SideFanRelay(bool setting) {
 
 void StartProbing() {
   myservo.write(10);
+  isProbing = true;
 }
 
 void SendProbeSignal() {
-  Serial.println("514 0 1;");
+  if (clientOps && isProbing) {
+    Serial.println("514 0 1;");
+    myservo.write(90);
+    isProbing = false;
+  }
+}
+
+void ResetProbe(){
+  //Serial.println("Reset");
   myservo.write(90);
+  myservo.write(160);
 }
 
 //LATER MISSCHIEN VERANDEREN NAAR ANDERE CODE VOOR VERPLAATSING KOP
@@ -47,6 +62,7 @@ void handlePausefromSensor() {
 }
 
 bool filamentStatus = false;
+bool lastFilamentStatus = false;
 long lastDebounceTime = 0;
 long debounceDelay = 50;
 //STILL ADD DEBOUNCING AND ONLY FIRING ONCE
@@ -56,11 +72,12 @@ void MiscLoop() {
     sensorTimePreviousMillis = currentMillis;
     filamentStatus = digitalRead(filamentDetectorPin);
     if ((millis() - lastDebounceTime) > debounceDelay) {
-      if (filamentStatus) {
-        handlePausefromSensor();
+      if (filamentStatus != lastFilamentStatus) {
+        if (!filamentStatus) {
+          handlePausefromSensor();
+        } else {
+        }
         lastDebounceTime = millis();  //set the current time
-      } else {
-        lastDebounceTime = millis();
       }
     }
   }

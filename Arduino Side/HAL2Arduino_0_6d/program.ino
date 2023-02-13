@@ -81,7 +81,7 @@ void processCommand(long command, long dataOne, long dataTwo) {
         SideFanRelay(true);
       } else if (command == 505 && dataTwo == 0) {
         SideFanRelay(false);
-      } else if (command == 514) {
+      } else if (command == 515 && dataTwo == 1) {
         StartProbing();
       }
 #endif

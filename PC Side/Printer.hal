@@ -282,7 +282,7 @@ net jog-selected-neg      halui.axis.selected.minus
 net spindle-manual-cw     halui.spindle.0.forward
 net spindle-manual-ccw    halui.spindle.0.reverse
 net spindle-manual-stop   halui.spindle.0.stop
-net machine-is-on         halui.machine.is-on
+net machine-is-on Hal2Arduino.StatusPin <= halui.machine.is-on
 net jog-speed             halui.axis.jog-speed
 net MDI-mode              halui.mode.is-mdi
 
@@ -317,7 +317,7 @@ net tool-prepare-loopback   iocontrol.0.tool-prepare      =>  iocontrol.0.tool-p
 
 #  ---Custom Pins---
 net isRunning Hal2Arduino.ProgramStatusPin halui.program.is-running
-net isOn Hal2Arduino.StatusPin halui.machine.is-on
+#net isOn Hal2Arduino.StatusPin halui.machine.is-on
 net pause halui.program.pause Hal2Arduino.PausePin
 net resume halui.program.resume Hal2Arduino.ResumePin
 net stop halui.program.stop Hal2Arduino.StopPin

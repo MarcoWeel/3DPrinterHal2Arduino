@@ -159,7 +159,8 @@ The serial link works as follows:
   996  Received confirmation to begin normal operation.
   997 Client ACK signal.
 
-  514 Probing
+  514 Probing output
+  515 start probing
   509 Pause command (used via web and filament sensor)
   
 */
@@ -185,7 +186,7 @@ The serial link works as follows:
 //#define commandsRequested "215 224 231 233" // 229"
 
 //UNO
-#define commandsRequested "501 502 503 504 505 506 507 508 510 800 801 514"
+#define commandsRequested "501 502 503 504 505 506 507 508 509 510 514 515 800 801"
 //NODEMCU
 //#define commandsRequested "509 510 511 512 513 800 801 802"
 

@@ -1248,7 +1248,7 @@ def commandHandler(codesAccepted, axisesRequested):
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
         if codesAccepted.find("511") > -1:
-            command=505
+            command=511
             hostCheck=c['StatusPin']
             if hostCheck != hostCheckOld[command]:
                 hostCheckOld[command]=hostCheck
@@ -1256,7 +1256,7 @@ def commandHandler(codesAccepted, axisesRequested):
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
     if codesAccepted.find("512") > -1:
-            command=505
+            command=512
             hostCheck=c['ProgramStatusPin']
             if hostCheck != hostCheckOld[command]:
                 hostCheckOld[command]=hostCheck
@@ -1264,8 +1264,16 @@ def commandHandler(codesAccepted, axisesRequested):
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
     if codesAccepted.find("513") > -1:
-            command=505
+            command=513
             hostCheck=c['TimeRemainingPin']
+            if hostCheck != hostCheckOld[command]:
+                hostCheckOld[command]=hostCheck
+                checkSum=hostCheck+command
+                comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
+                masterTx.put(comString)
+    if codesAccepted.find("515") > -1:
+            command=515
+            hostCheck=c['ProbeOutputPin']
             if hostCheck != hostCheckOld[command]:
                 hostCheckOld[command]=hostCheck
                 checkSum=hostCheck+command
@@ -1800,6 +1808,12 @@ def makePins(codesAccepted, axisesRequested):
         else:
             print "makePins: creating: %r"
             c.newpin("ProbeInputPin",hal.HAL_BIT,hal.HAL_OUT)
+    if codesAccepted.find("515") > -1:
+        if simulation == True:
+            print "creating: ProbeOutputPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("ProbeOutputPin",hal.HAL_BIT,hal.HAL_IN)
 
     # The following pins need to be iterated for each axis used. 
     for i in range(0, 10):
