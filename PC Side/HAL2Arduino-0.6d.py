@@ -418,6 +418,7 @@ def commandHandler(codesAccepted, axisesRequested):
 
                         if command == 514:
                             c['ProbeInputPin'] = val
+                            start_new_thread(pinResetter, ('ProbeInputPin',0,0.05 ) )
 
                             
 
@@ -1255,7 +1256,7 @@ def commandHandler(codesAccepted, axisesRequested):
                 checkSum=hostCheck+command
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
-    if codesAccepted.find("512") > -1:
+        if codesAccepted.find("512") > -1:
             command=512
             hostCheck=c['ProgramStatusPin']
             if hostCheck != hostCheckOld[command]:
@@ -1263,7 +1264,7 @@ def commandHandler(codesAccepted, axisesRequested):
                 checkSum=hostCheck+command
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
-    if codesAccepted.find("513") > -1:
+        if codesAccepted.find("513") > -1:
             command=513
             hostCheck=c['TimeRemainingPin']
             if hostCheck != hostCheckOld[command]:
@@ -1271,7 +1272,7 @@ def commandHandler(codesAccepted, axisesRequested):
                 checkSum=hostCheck+command
                 comString=str(command) + " 0 " + str(hostCheck) + ";" #str(int(checkSum)) + ";"
                 masterTx.put(comString)
-    if codesAccepted.find("515") > -1:
+        if codesAccepted.find("515") > -1:
             command=515
             hostCheck=c['ProbeOutputPin']
             if hostCheck != hostCheckOld[command]:
@@ -1287,6 +1288,10 @@ def commandHandler(codesAccepted, axisesRequested):
         else:
             sleep(0.001)
 
+def pinResetter(pinString, value, timeout):
+	sleep(timeout)
+	print "resetting pin"
+	c[pinString] = value
     
 def comService():
     print "comService: started."
@@ -2197,6 +2202,10 @@ except Exception:
     sleep(3)
     raise SystemExit
 finally:
+    sleep(5)
+    print("UNIT AND PORT CHECKPOINT")
+    print(listOfUnits)
+    print(listOfPorts)
     if len(listOfUnits) == len(listOfPorts) and len(listOfUnits) == requiredClients:
         sleep(1)
         makePins(str(listOfCommands), str(listOfAxis))
@@ -2224,5 +2233,5 @@ finally:
         msgBox("\aConnection Error:\nPlease reload the host application.")
         print("\aWait, something is not right here.")
         threadsRun=False
-	ser.close()
+        ser.close()
         raise SystemExit
