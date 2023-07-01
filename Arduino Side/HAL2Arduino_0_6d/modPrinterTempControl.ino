@@ -1,10 +1,13 @@
 #define useTemperature true
 // This modFile controls 3dprinter temperature functions.
 #if useTemperature
-const long timeInterval = 100;
+const long timeInterval = 500;
 unsigned long timePreviousMillis = 0;
 int countHead = 0;
 int countBed = 0;
+
+bool headLoopDone = false;
+bool bedLoopDone = false;
 
 const int BedAnalogPin = A0;
 const int HeadAnalogPin = A1;
@@ -22,65 +25,91 @@ bool IsStartupHead = true;
 bool IsStartupBed = true;
 
 int CalculateHeadTemp() {
-  float logR2, R2, T;
-  int TcAverage = 0;
-  Vo1 = analogRead(HeadAnalogPin);
-  R2 = R1 * (1023.0 / (float)Vo1 - 1.0);
-  logR2 = log(R2);
-  T = (1.0 / (c1 + c2 * logR2 + c3 * logR2 * logR2 * logR2));
-  Tc = T - 273.15;
-  if (Tc < (TcHeadOld + 20) && Tc > (TcHeadOld - 20) || IsStartupHead && Tc > 0) {
-    TcCombinedHead += Tc;
-    countHead++;
-  }
-  if (countHead == 10 || countHead > 10) {
-    TcAverage = TcCombinedHead / 10;
-    if (TcAverage != TcHeadOld && TcAverage < (TcHeadOld + 20) && TcAverage > (TcHeadOld - 20) || IsStartupHead) {
-      Serial.print("504 0 ");
-      Serial.print(TcAverage);
-      Serial.println(";");
+  headLoopDone = false;
+  int errorCount = 0;
+  while (!headLoopDone) {
+    float logR2, R2, T;
+    int TcAverage = 0;
+    Vo1 = analogRead(HeadAnalogPin);
+    R2 = R1 * (1023.0 / (float)Vo1 - 1.0);
+    logR2 = log(R2);
+    T = (1.0 / (c1 + c2 * logR2 + c3 * logR2 * logR2 * logR2));
+    Tc = T - 273.15;
 
-      Serial.print("800 0 ");
-      Serial.print(TcAverage);
-      Serial.println(";");
-      TcHeadOld = TcAverage;
-      TcCombinedHead = 0;
-      countHead = 0;
-      IsStartupHead = false;
-      return TcAverage;
+    if (Tc < (TcHeadOld + 10) && Tc > (TcHeadOld - 10) || IsStartupHead && Tc > 0) {
+      TcCombinedHead += Tc;
+      countHead++;
+      errorCount = 0;
+    } else {
+      errorCount++;
+    }
+    if (countHead == 10 || countHead > 10) {
+      TcAverage = TcCombinedHead / countHead;
+      if (TcAverage < (TcHeadOld + 20) && TcAverage > (TcHeadOld - 20) || IsStartupHead) {
+        Serial.print("504 0 ");
+        Serial.print(TcAverage);
+        Serial.println(";");
+
+        Serial.print("800 0 ");
+        Serial.print(TcAverage);
+        Serial.println(";");
+        TcHeadOld = TcAverage;
+        TcCombinedHead = 0;
+        countHead = 0;
+        IsStartupHead = false;
+        headLoopDone = true;
+        return TcAverage;
+      }
+    } else if (errorCount > 10) {
+      Serial.println(errorCount);
+      Serial.println("FAILHEAD");
+      Serial.println("507 0 0;");
+      break;
     }
   }
 }
 
 int CalculateBedTemp() {
-  float logR2, R2, T;
-  int TcAverage;
-  Vo2 = analogRead(BedAnalogPin);
-  R2 = R1 * (1023.0 / (float)Vo2 - 1.0);
-  logR2 = log(R2);
-  T = (1.0 / (c1 + c2 * logR2 + c3 * logR2 * logR2 * logR2));
-  Tc = T - 273.15;
-  if (Tc < (TcBedOld + 20) && Tc > (TcBedOld - 20) || IsStartupBed && Tc > 0) {
-    TcCombinedBed += Tc;
-    countBed++;
-  }
-  if (countBed == 10 || countBed > 10) {
-    TcAverage = TcCombinedBed / 10;
-    Serial.println(TcAverage);
-    Serial.println(TcBedOld);
-    if (TcAverage != TcBedOld && TcAverage < (TcBedOld + 20) && TcAverage > (TcBedOld - 20) || IsStartupBed) {
-      Serial.print("503 0 ");
-      Serial.print(TcAverage);
-      Serial.println(";");
+  int errorCount = 0;
+  bedLoopDone = false;
+  while (!bedLoopDone) {
+    float logR2, R2, T;
+    int TcAverage;
+    Vo2 = analogRead(BedAnalogPin);
+    R2 = R1 * (1023.0 / (float)Vo2 - 1.0);
+    logR2 = log(R2);
+    T = (1.0 / (c1 + c2 * logR2 + c3 * logR2 * logR2 * logR2));
+    Tc = T - 273.15;
+    if (Tc < (TcBedOld + 20) && Tc > (TcBedOld - 20) || IsStartupBed && Tc > 0) {
+      TcCombinedBed += Tc;
+      countBed++;
+      errorCount = 0;
+    } else {
+      errorCount++;
+    }
+    if (countBed == 10 || countBed > 10) {
+      TcAverage = TcCombinedBed / 10;
+      //.println(TcAverage);
+      //Serial.println(TcBedOld);
+      if (TcAverage != TcBedOld && TcAverage < (TcBedOld + 20) && TcAverage > (TcBedOld - 20) || IsStartupBed) {
+        Serial.print("503 0 ");
+        Serial.print(TcAverage);
+        Serial.println(";");
 
-      Serial.print("801 0 ");
-      Serial.print(TcAverage);
-      Serial.println(";");
-      TcBedOld = TcAverage;
-      TcCombinedBed = 0;
-      countBed = 0;
-      IsStartupBed = false;
-      return TcAverage;
+        Serial.print("801 0 ");
+        Serial.print(TcAverage);
+        Serial.println(";");
+        TcBedOld = TcAverage;
+        TcCombinedBed = 0;
+        countBed = 0;
+        IsStartupBed = false;
+        bedLoopDone = true;
+        return TcAverage;
+      }
+    } else if (errorCount > 10) {
+      Serial.println("FAILBED");
+      Serial.println("508 0 0;");
+      break;
     }
   }
 }
@@ -107,12 +136,16 @@ void SetupRelayPins() {
 void SetHeadTemperature(int HeadTargetTemp) {
   Serial.println("507 0 0;");
   HeadStatus = false;
+  digitalWrite(HeadRelayPin, HIGH);
+  HeadHeating = false;
   HeadTargetTemperature = HeadTargetTemp;
 }
 
 void SetBedTemperature(int BedTargetTemp) {
   Serial.println("508 0 0;");
   BedStatus = false;
+  digitalWrite(BedRelayPin, LOW);
+  BedHeating = false;
   BedTargetTemperature = BedTargetTemp;
 }
 
@@ -146,7 +179,7 @@ void HeadRelay(int temp, int tempExpected) {
   } else {
     digitalWrite(FanRelayPin, HIGH);
   }
-  if (HeadStatus == false && tempExpected < temp - 1 && tempExpected < temp + 5 && temp > -270 && tempExpected != 0) {
+  if (HeadStatus == false && tempExpected - 1 < temp && tempExpected < temp + 5 && temp > -270 && tempExpected != 0) {
     HeadStatus = true;
     Serial.println("507 0 1 508;");
   }
