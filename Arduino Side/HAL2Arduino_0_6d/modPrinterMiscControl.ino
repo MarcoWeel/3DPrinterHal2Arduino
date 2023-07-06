@@ -58,7 +58,7 @@ void ResetProbe(){
 
 //LATER MISSCHIEN VERANDEREN NAAR ANDERE CODE VOOR VERPLAATSING KOP
 void handlePausefromSensor() {
-  Serial.println("509 0 0;");
+  Serial.println("520 0 1;");
 }
 
 bool filamentStatus = false;

@@ -39,7 +39,6 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from pickle import TRUE
 import sys, string
 from turtle import distance
 #We only need some of the functions from the following modules
@@ -423,8 +422,10 @@ def commandHandler(codesAccepted, axisesRequested):
                             c['ProbeInputPin'] = val
                             start_new_thread(pinResetter, ('ProbeInputPin',0,0.05 ) )
 
+                        if command == 520:
+                            c['HasPlasticPin'] = val
                             
-
+                            
 
                         
 
@@ -1347,8 +1348,9 @@ def comService():
         print "Closing: %s" % port
 
 def makePins(codesAccepted, axisesRequested):
-#Here we make our HAL pins (without duplicates.)
+#Here we make our HAL pins (without duplicates.) 
     c.newpin("isFilling",hal.HAL_BIT,hal.HAL_IN)
+    c.newpin("OverWritePin",hal.HAL_BIT,hal.HAL_IN)
     if codesAccepted.find("100") > -1:
         if simulation == True:
             print "creating: motion_adaptive-feed"
@@ -1823,6 +1825,12 @@ def makePins(codesAccepted, axisesRequested):
         else:
             print "makePins: creating: %r"
             c.newpin("ProbeOutputPin",hal.HAL_BIT,hal.HAL_IN)
+    if codesAccepted.find("520") > -1:
+        if simulation == True:
+            print "creating: HasPlasticPin"
+        else:
+            print "makePins: creating: %r"
+            c.newpin("HasPlasticPin",hal.HAL_BIT,hal.HAL_IN)
 
     # The following pins need to be iterated for each axis used. 
     for i in range(0, 10):
@@ -2189,18 +2197,41 @@ def makePins(codesAccepted, axisesRequested):
 
 def StateLoop():
     print("StateLoopStarted")
+    overwrite = False
+    hasFilled = False
     distance = 0
-    lastDistance = 0
-    while(TRUE):
-        if(c.get_value("hasPlastic") == 1):
+    lastDistance = -1
+    while(False):
+        overwrite = c.get_value("OverWritePin")
+        if(c.get_value("HasPlasticPin") == 0 & overwrite == False):
+            if(lastDistance == -1):
+                lastDistance = hal.get_value("axis.a.pos-cmd")
+            distance = hal.get_value("axis.a.pos-cmd") - lastDistance
             if(c.get_value("isFilling") == 1):
-                print("TEST")
-            else:
-                print("TEST")
-                if(distance < 100):
-                    print("GAY")
+                hasFilled = True
+                if(distance < 400):
+                    print("MAX DISTANCE NOT REACHED")
                 else:
-                    print("ExtraGay")
+                    print("MAX DISTANCE REACHED PAUSE")
+                    if c['PausePin'] == 0:
+                        c['PausePin'] = 1
+                        c['ResumePin'] = 0
+            else:
+                if(hasFilled == True):
+                    if c['PausePin'] == 0:
+                        c['PausePin'] = 1
+                        c['ResumePin'] = 0
+                print("WAIT UNTIL FILLING")
+                if(distance < 400):
+                    print("MAX DISTANCE NOT REACHED")
+                else:
+                    print("MAX DISTANCE REACHED PAUSE")
+                    if c['PausePin'] == 0:
+                        c['PausePin'] = 1
+                        c['ResumePin'] = 0
+        else:
+            if(lastDistance != -1):
+                lastDistance = -1
 
 
 
