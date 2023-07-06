@@ -31,7 +31,7 @@ def PinResetter():
 #        c["StopPin"] = 0
 #    if hostCheck514 == 1:
 #        c["ProbeInputPin"] = 0
-
+#c.newpin("motion_debug-float-0",hal.HAL_FLOAT,hal.HAL_IN)
 try:
     start_new_thread(PinResetter,())
     #while(True):

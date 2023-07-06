@@ -39,7 +39,9 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from pickle import TRUE
 import sys, string
+from turtle import distance
 #We only need some of the functions from the following modules
 from thread import start_new_thread, exit
 from Queue import Queue
@@ -415,6 +417,7 @@ def commandHandler(codesAccepted, axisesRequested):
                         
                         if command == 510:
                             c['StopPin'] = 1
+                            start_new_thread(pinResetter, ('StopPin',0,0.05 ) )
 
                         if command == 514:
                             c['ProbeInputPin'] = val
@@ -1345,6 +1348,7 @@ def comService():
 
 def makePins(codesAccepted, axisesRequested):
 #Here we make our HAL pins (without duplicates.)
+    c.newpin("isFilling",hal.HAL_BIT,hal.HAL_IN)
     if codesAccepted.find("100") > -1:
         if simulation == True:
             print "creating: motion_adaptive-feed"
@@ -2183,6 +2187,24 @@ def makePins(codesAccepted, axisesRequested):
                 c.newpin("iocontrol_user-request-enable",hal.HAL_BIT,hal.HAL_IN)
 
 
+def StateLoop():
+    print("StateLoopStarted")
+    distance = 0
+    lastDistance = 0
+    while(TRUE):
+        if(c.get_value("hasPlastic") == 1):
+            if(c.get_value("isFilling") == 1):
+                print("TEST")
+            else:
+                print("TEST")
+                if(distance < 100):
+                    print("GAY")
+                else:
+                    print("ExtraGay")
+
+
+
+
 
 try:
     threadsRun=True
@@ -2210,6 +2232,7 @@ finally:
         sleep(1)
         makePins(str(listOfCommands), str(listOfAxis))
         start_new_thread( comService, (), )
+        start_new_thread( StateLoop, (), )
         masterTx.put("996 0 0 996;")
         if simulation:
             masterTx.put("996 0 0 996;")
