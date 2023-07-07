@@ -58,7 +58,7 @@ void ResetProbe(){
 
 //LATER MISSCHIEN VERANDEREN NAAR ANDERE CODE VOOR VERPLAATSING KOP
 void handlePausefromSensor() {
-  Serial.println("520 0 1;");
+  Serial.println("520 0 0;");
 }
 
 bool filamentStatus = false;
@@ -76,6 +76,7 @@ void MiscLoop() {
         if (!filamentStatus) {
           handlePausefromSensor();
         } else {
+          Serial.println("520 0 1;");
         }
         lastDebounceTime = millis();  //set the current time
       }
