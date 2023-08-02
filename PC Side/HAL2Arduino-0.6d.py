@@ -2201,13 +2201,15 @@ def StateLoop():
     hasFilled = False
     distance = 0
     lastDistance = -1
-    while(False):
-        overwrite = c.get_value("OverWritePin")
-        if(c.get_value("HasPlasticPin") == 0 & overwrite == False):
+    sleep(20)
+    while True:
+        sleep(0.1)
+        overwrite = c["OverWritePin"]
+        if(c["HasPlasticPin"] == 0 & overwrite == False):
             if(lastDistance == -1):
                 lastDistance = hal.get_value("axis.a.pos-cmd")
             distance = hal.get_value("axis.a.pos-cmd") - lastDistance
-            if(c.get_value("isFilling") == 1):
+            if(c["isFilling"] == 1):
                 hasFilled = True
                 if(distance < 400):
                     print("MAX DISTANCE NOT REACHED")
@@ -2263,7 +2265,7 @@ finally:
         sleep(1)
         makePins(str(listOfCommands), str(listOfAxis))
         start_new_thread( comService, (), )
-        start_new_thread( StateLoop, (), )
+        start_new_thread( StateLoop, () )
         masterTx.put("996 0 0 996;")
         if simulation:
             masterTx.put("996 0 0 996;")
