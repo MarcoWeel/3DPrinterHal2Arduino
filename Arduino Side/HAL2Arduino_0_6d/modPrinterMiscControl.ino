@@ -75,8 +75,10 @@ void MiscLoop() {
       if (filamentStatus != lastFilamentStatus) {
         if (!filamentStatus) {
           handlePausefromSensor();
+          lastFilamentStatus = filamentStatus;
         } else {
           Serial.println("520 0 1;");
+          lastFilamentStatus = filamentStatus;
         }
         lastDebounceTime = millis();  //set the current time
       }
